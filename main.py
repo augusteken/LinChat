@@ -126,13 +126,15 @@ def query_documents(question, top_k=3):
     
     # Query ChatGPT with context
     chat_response = client.chat.completions.create(
-        model="gpt-4",
+        #model="gpt-4",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a helpful assistant that answers questions about association governing documents. Use the provided context to answer questions accurately."},
             {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"}
         ]
     )
-    
+    print(chat_response.usage)
+
     return chat_response.choices[0].message.content
 
 def main():
