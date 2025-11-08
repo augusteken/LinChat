@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinChat - Stadgedokument Chatbot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --magenta: #E1007A;
+            --purple: #7B217C;
+            --cyan: #00B5E2;
+            --orange: #FF9E1B;
+            --yellow: #FFED00;
+            --pink-light: #D786B3;
+            --purple-light: #AE75AA;
+            --cyan-light: #8BD3E6;
+            --yellow-light: #FBE122;
+            --grey-light: #F5F5F5;
+            --grey-dark: #333333;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--magenta) 0%, var(--purple) 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--grey-dark);
+        }
+
+        /* Header */
+        .top-header {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .top-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--magenta);
+            margin: 0;
+        }
+
+        .top-header .subtitle {
+            font-size: 16px;
+            color: var(--grey-dark);
+            margin-top: 5px;
+            font-weight: 400;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 80vh;
+            max-height: 800px;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: var(--grey-light);
+            padding: 15px 30px;
+            border-bottom: 3px solid var(--magenta);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-bar .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .stat-badge {
+            background: var(--magenta);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        /* Controls */
+        .controls {
+            padding: 20px 30px;
+            background: white;
+            border-bottom: 2px solid var(--grey-light);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--magenta);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--purple);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(225, 0, 122, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--cyan);
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--purple);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 181, 226, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .file-upload-label {
+            padding: 12px 24px;
+            background: var(--orange);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-upload-label:hover {
+            background: var(--purple);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 158, 27, 0.3);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Files List */
+        .files-list {
+            padding: 15px 30px;
+            background: var(--grey-light);
+            border-bottom: 2px solid #e0e0e0;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .files-list-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--purple);
+            font-size: 14px;
+        }
+
+        .file-item {
+            padding: 4px 0;
+            color: var(--grey-dark);
+            font-size: 13px;
+        }
+
+        /* Chat Container */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: white;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 16px 20px;
+            border-radius: 16px;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--magenta) 0%, var(--purple) 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-content {
+            background: var(--grey-light);
+            color: var(--grey-dark);
+            border-bottom-left-radius: 4px;
+            border-left: 4px solid var(--cyan);
+        }
+
+        .message.system {
+            justify-content: center;
+        }
+
+        .message.system .message-content {
+            background: #FFF9E6;
+            color: var(--grey-dark);
+            border: 2px solid var(--yellow);
+            border-radius: 8px;
+            font-size: 14px;
+            max-width: 80%;
+        }
+
+        /* Input Container */
+        .input-container {
+            padding: 25px 30px;
+            background: white;
+            border-top: 3px solid var(--magenta);
+            display: flex;
+            gap: 15px;
+        }
+
+        #question-input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid var(--grey-light);
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        #question-input:focus {
+            border-color: var(--magenta);
+        }
+
+        #send-btn {
+            padding: 14px 32px;
+            background: var(--magenta);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        #send-btn:hover:not(:disabled) {
+            background: var(--purple);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(225, 0, 122, 0.4);
+        }
+
+        #send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loader */
+        .loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--grey-light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--magenta);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--purple);
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <h1>LinChat</h1>
+        <div class="subtitle">Ställ frågor om LinTeks stadgedokument</div>
+    </div>
+
+    <div class="main-container">
+        <div class="container">
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span>Vektorer i databas:</span>
+                    <span class="stat-badge" id="stats">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Status:</span>
+                    <span style="color: var(--cyan); font-weight: 600;">● Aktiv</span>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <label for="file-input" class="file-upload-label">
+                    📁 Välj PDF-fil
+                </label>
+                <input type="file" id="file-input" accept=".pdf" onchange="uploadFile()">
+                
+                <button class="btn btn-secondary" id="vectorize-btn" onclick="vectorizeDocuments()">
+                    🔄 Vektorisera dokument
+                </button>
+            </div>
+
+            <div class="files-list" id="files-list">
+                <div class="files-list-title">Uppladdade dokument:</div>
+                <div id="files-container">Laddar...</div>
+            </div>
+
+            <div class="chat-container" id="chat-container">
+                <div class="message system">
+                    <div class="message-content">
+                        👋 Välkommen! Ladda upp PDF-filer och vektorisera dem, sedan kan du ställa frågor om innehållet.
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <input 
+                    type="text" 
+                    id="question-input" 
+                    placeholder="Ställ en fråga om dokumenten..."
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button id="send-btn" onclick="sendQuestion()">Skicka</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isProcessing = false;
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                document.getElementById('stats').textContent = data.vector_count || 0;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        async function loadFiles() {
+            try {
+                const response = await fetch('/api/list-files');
+                const data = await response.json();
+                const container = document.getElementById('files-container');
+                
+                if (data.files && data.files.length > 0) {
+                    container.innerHTML = data.files.map(file => 
+                        `<div class="file-item">📄 ${file}</div>`
+                    ).join('');
+                } else {
+                    container.innerHTML = '<div class="file-item">Inga filer uppladdade ännu</div>';
+                }
+            } catch (error) {
+                console.error('Error loading files:', error);
+            }
+        }
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            
+            if (!file) return;
+
+            addMessage('system', `Laddar upp ${file.name}...`);
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/upload-file', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    addMessage('system', data.message + ' (Kom ihåg att vektorisera!)');
+                    loadFiles();
+                } else {
+                    addMessage('system', `Fel: ${data.error}`);
+                }
+            } catch (error) {
+                addMessage('system', `Fel: ${error.message}`);
+            } finally {
+                fileInput.value = '';
+            }
+        }
+
+        async function vectorizeDocuments() {
+            const btn = document.getElementById('vectorize-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Vektoriserar...';
+
+            addMessage('system', 'Vektoriserar alla dokument i docs-mappen...');
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    addMessage('system', '✅ ' + data.message);
+                    loadStats();
+                } else {
+                    addMessage('system', `❌ Fel: ${data.error}`);
+                }
+            } catch (error) {
+                addMessage('system', `❌ Fel: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔄 Vektorisera dokument';
+            }
+        }
+
+        async function sendQuestion() {
+            if (isProcessing) return;
+
+            const input = document.getElementById('question-input');
+            const question = input.value.trim();
+
+            if (!question) return;
+
+            addMessage('user', question);
+            input.value = '';
+
+            isProcessing = true;
+            const sendBtn = document.getElementById('send-btn');
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span class="loader"></span>';
+
+            addMessage('assistant', '...');
+
+            try {
+                const response = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question })
+                });
+
+                const data = await response.json();
+
+                const messages = document.querySelectorAll('.message.assistant');
+                const lastMessage = messages[messages.length - 1];
+                if (lastMessage && lastMessage.textContent.trim() === '...') {
+                    lastMessage.remove();
+                }
+
+                if (response.ok) {
+                    addMessage('assistant', data.answer);
+                } else {
+                    addMessage('system', `❌ Fel: ${data.error}`);
+                }
+            } catch (error) {
+                const messages = document.querySelectorAll('.message.assistant');
+                const lastMessage = messages[messages.length - 1];
+                if (lastMessage && lastMessage.textContent.trim() === '...') {
+                    lastMessage.remove();
+                }
+                addMessage('system', `❌ Fel: ${error.message}`);
+            } finally {
+                isProcessing = false;
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = 'Skicka';
+            }
+        }
+
+        function addMessage(type, content) {
+            const chatContainer = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = content;
+            
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !isProcessing) {
+                sendQuestion();
+            }
+        }
+
+        loadStats();
+        loadFiles();
+    </script>
+</body>
+</html>
