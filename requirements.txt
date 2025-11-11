@@ -2,3 +2,4 @@ pinecone
 openai
 pypdf2
 python-dotenv
+flask
